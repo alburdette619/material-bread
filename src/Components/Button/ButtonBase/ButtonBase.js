@@ -26,12 +26,14 @@ class ButtonBase extends Component {
 
     icon: PropTypes.node,
     iconPosition: PropTypes.string,
+    iconSize: PropTypes.number,
 
     disabled: PropTypes.bool,
     disableRipple: PropTypes.bool,
 
     text: PropTypes.string,
     textStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    useInputCasing: PropTypes.bool,
 
     typeTextColor: PropTypes.string,
     typeButtonStyles: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
@@ -44,6 +46,7 @@ class ButtonBase extends Component {
   static defaultProps = {
     iconPosition: 'left',
     dense: false,
+    useInputCasing: false,
   };
 
   _renderText() {
@@ -54,6 +57,7 @@ class ButtonBase extends Component {
       theme,
       hideLabel,
       dense,
+      useInputCasing,
     } = this.props;
 
     if (hideLabel) return null;
@@ -69,7 +73,7 @@ class ButtonBase extends Component {
           },
           textStyle,
         ]}>
-        {text.toUpperCase()}
+        {useInputCasing ? text : text.toUpperCase()}
       </Text>
     );
   }
@@ -93,7 +97,14 @@ class ButtonBase extends Component {
     );
   }
   _renderIcon() {
-    const { icon, iconPosition, typeTextColor, loading, dense } = this.props;
+    const {
+      icon,
+      iconPosition,
+      iconSize,
+      typeTextColor,
+      loading,
+      dense,
+    } = this.props;
     if (loading) {
       return this._renderLoader();
     }
@@ -103,7 +114,7 @@ class ButtonBase extends Component {
           marginRight: iconPosition == 'left' ? 8 : 0,
           marginLeft: iconPosition == 'right' ? 8 : 0,
         },
-        size: dense ? 14 : 18,
+        size: iconSize || (dense ? 14 : 18),
         color: typeTextColor ? typeTextColor : 'white',
       });
     }

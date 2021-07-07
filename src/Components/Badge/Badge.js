@@ -146,6 +146,7 @@ class Badge extends Component {
             position: children ? 'absolute' : 'relative',
             top: top ? top : 0,
             transform: [{ scale: this.state.scale }],
+            opacity: this.props.visible ? 1 : 0,
           },
           positionStyle,
           style,

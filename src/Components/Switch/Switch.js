@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { Animated, View, TouchableWithoutFeedback } from 'react-native';
+import {
+  Animated,
+  I18nManager,
+  View,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import PropTypes from 'prop-types';
 import withTheme from '../../Theme/withTheme';
 
@@ -21,17 +26,22 @@ class Switch extends Component {
     color: PropTypes.string,
     loading: PropTypes.bool,
     testID: PropTypes.string,
+    width: PropTypes.number,
   };
 
-  static defaultProps = { labelPos: 'right' };
+  static defaultProps = { labelPos: 'right', width: 36 };
 
   state = {
     thumbTranslateX: new Animated.Value(0),
   };
 
   componentDidMount() {
-    if (this.props.checked) {
-      this.setState({ thumbTranslateX: new Animated.Value(18) });
+    const { checked, width } = this.props;
+    const { thumbTranslateX } = this.state;
+
+    if (checked) {
+      const xValue = width / 2;
+      thumbTranslateX.setValue(I18nManager.isRTL ? -xValue : xValue);
     }
   }
 
@@ -60,20 +70,42 @@ class Switch extends Component {
 
   handleSwitch() {
     const { thumbTranslateX } = this.state;
-    const { checked } = this.props;
+    const { checked, width } = this.props;
 
-    let xValue = 18;
+    let xValue = width / 2;
     if (!checked) {
       xValue = 0;
     }
 
     Animated.parallel([
       Animated.timing(thumbTranslateX, {
-        toValue: xValue,
+        toValue: I18nManager.isRTL ? -xValue : xValue,
         duration: 300,
       }),
     ]).start();
   }
+
+  getDimensions = width => {
+    const height = width * (8 / 9);
+
+    return {
+      height,
+      trackDimensions: {
+        width,
+        height: height * (7 / 16),
+        borderRadius: height * (5 / 16),
+      },
+      thumbRippleDimensions: {
+        width: width * (8 / 9),
+        top: height * -(9 / 32),
+        left: width * -(2 / 9),
+      },
+      thumbDimensions: {
+        width: width * (5 / 9),
+        height: height * (5 / 8),
+      },
+    };
+  };
 
   render() {
     const { thumbTranslateX } = this.state;
@@ -89,6 +121,7 @@ class Switch extends Component {
       onPress,
       loading,
       testID,
+      width,
       ...rest
     } = this.props;
 
@@ -96,6 +129,13 @@ class Switch extends Component {
       ? colorTool(color).alpha(0.54)
       : colorTool(theme.primary.main).alpha(0.54);
     let thumbColor = color ? color : theme.primary.main;
+
+    const {
+      height,
+      trackDimensions,
+      thumbRippleDimensions,
+      thumbDimensions,
+    } = this.getDimensions(width);
 
     return (
       <View style={[styles.container, style]} testID={testID} {...rest}>
@@ -106,6 +146,7 @@ class Switch extends Component {
             {
               backgroundColor:
                 checked && !loading ? trackColor : 'rgba(0,0,0,.30)',
+              ...trackDimensions,
             },
             trackStyle,
           ]}
@@ -114,13 +155,20 @@ class Switch extends Component {
             rippleContainerBorderRadius={100}
             style={[
               styles.thumbRipple,
-              { transform: [{ translateX: thumbTranslateX }] },
+              {
+                transform: [{ translateX: thumbTranslateX }],
+                height,
+                ...thumbRippleDimensions,
+              },
             ]}
             onPress={onPress}>
             <Animated.View
               style={[
                 styles.thumb,
-                { backgroundColor: checked && !loading ? thumbColor : 'white' },
+                {
+                  backgroundColor: checked && !loading ? thumbColor : 'white',
+                  ...thumbDimensions,
+                },
                 thumbStyle,
               ]}>
               {loading ? (

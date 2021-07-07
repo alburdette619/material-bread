@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Easing, StyleSheet } from 'react-native';
+import { Animated, Easing, I18nManager, StyleSheet } from 'react-native';
 import withTheme from '../../../Theme/withTheme';
 import styles from './TextFieldLabel.styles';
 import {
@@ -65,9 +65,9 @@ class TextFieldLabel extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { focused, type } = this.props;
+    const { focused, type, value } = this.props;
 
-    if (focused !== prevProps.focused) {
+    if (focused !== prevProps.focused || value !== prevProps.value) {
       if (type == 'outlined') {
         this._handleLabelOutlinedAnimation();
       } else {
@@ -201,10 +201,19 @@ class TextFieldLabel extends Component {
       theme.subtitleOne.fontSize ||
       16;
 
+    const baseLineHeight =
+      (StyleSheet.flatten(style) || {}).lineHeight ||
+      theme.subtitleOne.lineHeight ||
+      24;
+
     const fontStyle = {
       fontSize: fontSizeAnimation.interpolate({
         inputRange: [0, 1],
         outputRange: [baseFontSize, baseFontSize * (dense ? 0.65 : 0.75)],
+      }),
+      lineHeight: fontSizeAnimation.interpolate({
+        inputRange: [0, 1],
+        outputRange: [baseLineHeight, baseLineHeight * (dense ? 0.5 : 0.6)],
       }),
     };
 
@@ -227,7 +236,7 @@ class TextFieldLabel extends Component {
               paddingHorizontal: type == 'outlined' ? 4 : 0,
               transform: [
                 { translateY: translateYAnimation },
-                { translateX: translateX },
+                { translateX: I18nManager.isRTL ? -translateX : translateX },
               ],
             },
             style,

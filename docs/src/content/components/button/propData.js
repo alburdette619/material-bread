@@ -30,6 +30,7 @@ const propData = [
     '',
   ],
   ['iconPosition', 'Postion of icon in button', 'string: left, right', 'left'],
+  ['iconSize', 'Custom size for icon', 'number', '18'],
   ['loading', 'Toggles loading indicator in button', 'bool', ''],
   ['onPress', 'Callback on button', 'func', ''],
   [
@@ -59,6 +60,13 @@ const propData = [
     'Indicates the type of button from available',
     'string: flat, text, outlined, contained',
     'text',
+  ],
+
+  [
+    'useInputCasing',
+    'Use text casing as input and do not auto-capitalize',
+    'boolean',
+    'false',
   ],
 ];
 
